@@ -1,9 +1,0 @@
-$breakpoints: (
-  tablet: 768px
-);
-
-@mixin media-tablet {
-  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
-    @content;
-  }
-}

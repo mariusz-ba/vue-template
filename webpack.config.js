@@ -1,23 +1,32 @@
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const paths = {
+  bundleEntry: path.join(__dirname, 'src/main.js'),
+  bundleOutputPath: path.join(__dirname, 'dist'),
+  bundleOutputFilename: 'main.js',
+  htmlTemplateEntry: path.join(__dirname, 'src', 'index.html'),
+  htmlTemplateOutput: path.join(__dirname, 'dist', 'index.html'),
+  cssFilename: 'main.css'
+}
 
 function createWebpackConfig(environment) {
   const env = environment.dev ? 'dev' : 'prod';
 
   return {
-    mode: getModeForEnv(env),
-    devtool: getDevtoolForEnv(env),
-    entry: path.join(__dirname, 'src', 'main.js'),
+    mode: getMode(env),
+    devtool: getDevtool(env),
+    entry: paths.bundleEntry,
     output: {
-      path: path.join(__dirname, 'dist'),
-      filename: 'main.js'
+      path: paths.bundleOutputPath,
+      filename: paths.bundleOutputFilename
     },
     module: {
       rules:[
-        vueLoaderRule(env),
-        babelLoaderRule(env),
+        vueLoaderRule(),
+        babelLoaderRule(),
         styleLoaderRule(env)
       ]
     },
@@ -31,18 +40,11 @@ function createWebpackConfig(environment) {
   };
 };
 
-function getModeForEnv(env) {
-  switch (env) {
-    case 'dev':
-      return 'development';
-    case 'prod':
-      return 'production';
-    default:
-      return 'development';
-  }
+function getMode(env) {
+  return env === 'prod' ? 'production' : 'development';
 }
 
-function getDevtoolForEnv(env) {
+function getDevtool(env) {
   return env === 'dev' ? 'inline-source-map' : '';
 }
 
@@ -65,9 +67,7 @@ function styleLoaderRule(env) {
   return {
     test: /\.s?[ac]ss/,
     use: [
-      {
-        loader: MiniCssExtractPlugin.loader,
-      },
+      env === 'dev' ? 'vue-style-loader' : MiniCssExtractPlugin.loader,
       'css-loader',
       'sass-loader'
     ]
@@ -75,16 +75,18 @@ function styleLoaderRule(env) {
 }
 
 function getPlugins(env) {
-  return [
-    new VueLoaderPlugin(),
-    new MiniCssExtractPlugin({
-      filename: "main.css"
-    }),
-    new HtmlWebpackPlugin({
-      filename: path.join(__dirname, 'dist', 'index.html'),
-      template: path.join(__dirname, 'src', 'index.html')
-    })
-  ];
+  const vueLoaderPlugin = new VueLoaderPlugin();
+  const miniCssExtractPlugin = new MiniCssExtractPlugin({
+    filename: paths.cssFilename
+  });
+  const htmlWebpackPlugin = new HtmlWebpackPlugin({
+    filename: paths.htmlTemplateOutput,
+    template: paths.htmlTemplateEntry
+  });
+
+  return env === 'prod'
+    ? [vueLoaderPlugin, miniCssExtractPlugin, htmlWebpackPlugin]
+    : [vueLoaderPlugin, htmlWebpackPlugin];
 }
 
 module.exports = createWebpackConfig;

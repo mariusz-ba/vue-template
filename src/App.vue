@@ -1,20 +1,35 @@
 <template>
   <div class="app">
-    <input-vue :initial-value="title" />
+    <h1 class="app__title">{{ title }}</h1>
   </div>
 </template>
 
 <script>
-import InputVue from './components/inputVue/inputVue';
-
 export default {
+  name: 'app',
   data() {
     return {
       title: 'Hello World'
     }
-  },
-  components: {
-    InputVue
   }
 };
 </script>
+
+<style lang="scss">
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+.app {
+  &__title {
+    font-size: 25px;
+    font-weight: 700;
+  }
+}
+</style>

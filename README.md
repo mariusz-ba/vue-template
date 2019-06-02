@@ -8,7 +8,7 @@ npm install
 ```
 
 # Running
-If You want to run project for development use:
+If you want to run project for development use:
 ```bash
 npm start
 ```
